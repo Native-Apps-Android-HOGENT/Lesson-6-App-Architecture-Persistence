@@ -69,8 +69,14 @@ dependencies {
     implementation "android.arch.navigation:navigation-ui-ktx:$version_navigation"
 
     // Testing
-    testImplementation 'junit:junit:4.12'
+    testImplementation "junit:junit:4.12"
+    testImplementation "io.mockk:mockk:$version_mockk"
+    // To test coroutines with blocking
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$version_coroutine"
+    // For InstantTaskExecutorRule to test LiveData
+    testImplementation "androidx.arch.core:core-testing:$version_lifecycle"
     androidTestImplementation "androidx.test.ext:junit:$version_junit"
     androidTestImplementation "androidx.test.espresso:espresso-core:$version_espresso"
+
 }
 

@@ -18,15 +18,102 @@ package com.example.android.trackmysleepquality.sleeptracker
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import com.example.android.trackmysleepquality.database.SleepDatabaseDao
+import com.example.android.trackmysleepquality.database.SleepNight
+import com.example.android.trackmysleepquality.formatNights
+import kotlinx.coroutines.*
+import org.jetbrains.annotations.TestOnly
 
 /**
  * ViewModel for SleepTrackerFragment.
  */
 class SleepTrackerViewModel(
-        val database: SleepDatabaseDao,
+        private val sleepDao: SleepDatabaseDao,
         application: Application) : AndroidViewModel(application) {
 
+    private var viewModelJob = Job()
+
+    private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
+
+    private val _tonight = MutableLiveData<SleepNight?>()
+    val tonight: LiveData<SleepNight?>
+        @TestOnly
+        get() = _tonight
+
+    private val nights = sleepDao.getAllNights()
+
+    val nightsString = Transformations.map(nights) { nights ->
+        formatNights(nights, application.resources)
+    }
+
+    init {
+        initializeTonight()
+    }
+
+    private fun initializeTonight() {
+        uiScope.launch {
+            _tonight.value = getTonightFromDatabase()
+        }
+    }
+
+    fun onStartTacking() {
+        uiScope.launch {
+            val newNight = SleepNight()
+            insert(newNight)
+            _tonight.value = getTonightFromDatabase()
+        }
+    }
+
+    fun onStopTracking() {
+        uiScope.launch {
+            val oldNight = _tonight.value ?: return@launch
+            oldNight.endTimeMilli = System.currentTimeMillis()
+            update(oldNight)
+        }
+    }
+
+    fun onClear() {
+        uiScope.launch {
+            clear()
+            _tonight.value = null
+        }
+    }
+
+    private suspend fun clear() {
+        withContext(Dispatchers.IO) {
+            sleepDao.clear()
+        }
+    }
+
+    private suspend fun update(oldNight: SleepNight) {
+        withContext(Dispatchers.IO) {
+            sleepDao.update(oldNight)
+        }
+    }
+
+    private suspend fun insert(newNight: SleepNight) {
+        withContext(Dispatchers.IO) {
+            sleepDao.insert(newNight)
+        }
+    }
+
+    private suspend fun getTonightFromDatabase(): SleepNight? {
+        return withContext(Dispatchers.IO) {
+            var night = sleepDao.getTonight()
+            if (night?.endTimeMilli != night?.startTimeMilli) {
+                night = null
+            }
+            night
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        viewModelJob.cancel()
+    }
 
 }
 

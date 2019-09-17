@@ -28,7 +28,7 @@ import androidx.appcompat.app.AppCompatActivity
  * - Start time, end time, quality, and time slept
  *
  * This app demonstrates the following views and techniques:
- * - Room database, DAO, and Coroutines
+ * - Room sleepDao, DAO, and Coroutines
  *
  * It also uses and builds on the following techniques from previous lessons:
  * - Transformation map
