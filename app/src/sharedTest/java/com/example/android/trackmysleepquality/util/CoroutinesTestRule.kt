@@ -1,4 +1,4 @@
-package com.example.android.trackmysleepquality
+package com.example.android.trackmysleepquality.util
 
 /*
  * Copyright 2019 Google LLC

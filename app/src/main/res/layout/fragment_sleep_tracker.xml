@@ -23,6 +23,7 @@
          the whole ViewModel, so that we can access the LiveData,
          click handlers, and state variables. -->
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraint_sleepTracker"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".sleeptracker.SleepTrackerFragment">

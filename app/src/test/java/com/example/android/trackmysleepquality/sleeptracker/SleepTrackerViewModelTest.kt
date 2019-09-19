@@ -2,10 +2,11 @@ package com.example.android.trackmysleepquality.sleeptracker
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
-import com.example.android.trackmysleepquality.CoroutinesTestRule
 import com.example.android.trackmysleepquality.database.SleepDatabaseDao
 import com.example.android.trackmysleepquality.database.SleepNight
-import com.example.android.trackmysleepquality.observeForTesting
+import com.example.android.trackmysleepquality.util.CoroutinesTestRule
+import com.example.android.trackmysleepquality.util.getValueForTest
+import com.example.android.trackmysleepquality.util.observeForTesting
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -23,7 +24,6 @@ class SleepTrackerViewModelTest {
     private val sleepDao: SleepDatabaseDao = mockk()
 
     private val tonight = SleepNight()
-    private val nights = MutableLiveData<List<SleepNight>>()
 
     @ExperimentalCoroutinesApi
     @get:Rule
@@ -78,20 +78,44 @@ class SleepTrackerViewModelTest {
     }
 
     @Test
-    fun sleepTrackerVM_onStopTracking_updatesDatabase() = coroutinesTestRule.testDispatcher.runBlockingTest {
+    fun sleepTrackerVM_onStopTracking_updatesDatabase() {
         // Arrange
         // Simulate a sleep already being started
         every { sleepDao.getTonight() } returns tonight
         every { sleepDao.update(any()) } returns Unit
-        viewModel = SleepTrackerViewModel(
-                application = mockk(),
-                sleepDao = sleepDao)
+        runBlockingTest {
+            viewModel = SleepTrackerViewModel(
+                    application = mockk(),
+                    sleepDao = sleepDao)
 
-        // Act
-        viewModel.onStopTracking()
+            // Act
+            viewModel.onStopTracking()
+        }
 
         //Assert
         verify { sleepDao.update(any()) }
+    }
+
+    @Test
+    fun sleepTrackerVM_onStopTracking_requestsNavigation() {
+        // Arrange
+        // Simulate a sleep already being started
+        every { sleepDao.getTonight() } returns tonight
+        every { sleepDao.update(any()) } returns Unit
+
+        runBlockingTest {
+            viewModel = SleepTrackerViewModel(
+                    application = mockk(),
+                    sleepDao = sleepDao)
+
+            // Act
+            viewModel.onStopTracking()
+        }
+
+        //Assert
+        viewModel.navigateToSleepQuality.observeForTesting {
+            assertNotNull(viewModel.navigateToSleepQuality.value)
+        }
     }
 
     @Test
