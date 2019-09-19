@@ -30,8 +30,12 @@ buildscript {
         version_room = "2.1.0"
 
         version_junit = "1.1.0"
-        version_espresso = "3.1.1"
         version_mockk = "1.9.3"
+
+        version_espresso = "3.2.0"
+        version_junit = "1.1.1"
+        version_testrunner = "1.2.0"
+        version_testrules = "1.2.0"
     }
 
     repositories {

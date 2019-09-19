@@ -75,8 +75,13 @@ dependencies {
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$version_coroutine"
     // For InstantTaskExecutorRule to test LiveData
     testImplementation "androidx.arch.core:core-testing:$version_lifecycle"
-    androidTestImplementation "androidx.test.ext:junit:$version_junit"
+
+    // UI Testing with Espresso
     androidTestImplementation "androidx.test.espresso:espresso-core:$version_espresso"
+    androidTestImplementation "androidx.test.espresso:espresso-contrib:$version_espresso"
+    androidTestImplementation "androidx.test.ext:junit:$version_junit"
+    androidTestImplementation "androidx.test:runner:$version_testrunner"
+    androidTestImplementation "androidx.test:rules:$version_testrules"
 
 }
 
